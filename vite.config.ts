@@ -26,8 +26,25 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Précache : tout sauf les vidéos (~21 MB) — elles seront mises en cache
+        // au premier visionnage via la stratégie runtime ci-dessous.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['videos/**'],
         navigateFallback: '/index.html',
+        // Vidéos servies depuis Vercel : range requests + cache progressif
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            urlPattern: /\/videos\/.*\.mp4$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'exercise-videos',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 90 },
+              rangeRequests: true,
+              cacheableResponse: { statuses: [0, 200, 206] },
+            },
+          },
+        ],
       },
     }),
   ],

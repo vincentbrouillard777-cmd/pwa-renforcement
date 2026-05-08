@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import type { Exercise } from '../data/exercises';
-import { Play, ExternalLink } from 'lucide-react';
+import { Play } from 'lucide-react';
+import { VideoModal } from './VideoModal';
 
 type Props = {
   exercise: Exercise;
@@ -7,6 +9,8 @@ type Props = {
 };
 
 export function ExerciseCard({ exercise, showVideoButton = true }: Props) {
+  const [showVideo, setShowVideo] = useState(false);
+
   const dosage =
     exercise.type === 'time'
       ? `${exercise.sets}× ${exercise.durationSec}s${exercise.bilateral ? ' chaque côté' : ''} · repos ${exercise.restSec}s`
@@ -31,14 +35,19 @@ export function ExerciseCard({ exercise, showVideoButton = true }: Props) {
       )}
       <div className="text-sm text-slate-200 font-medium">{dosage}</div>
       {showVideoButton && (
-        <a
-          href={exercise.videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-emerald-300 underline"
+        <button
+          onClick={() => setShowVideo(true)}
+          className="inline-flex items-center gap-2 text-sm text-emerald-300 underline tap-highlight-none"
         >
-          <Play size={16} /> Voir la vidéo <ExternalLink size={14} />
-        </a>
+          <Play size={16} /> Voir la vidéo
+        </button>
+      )}
+      {showVideo && (
+        <VideoModal
+          src={exercise.localVideoUrl}
+          title={exercise.name}
+          onClose={() => setShowVideo(false)}
+        />
       )}
     </div>
   );
